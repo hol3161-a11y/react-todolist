@@ -77,27 +77,21 @@ const TodoStore = create((set) => ({
         }
     },
 
-    completeTodo: async function (id) {
+    completeTodo: async function(id){
+        const res = await axios.put(
+            `${process.env.REACT_APP_APIURL}/state?id=${id}`,
+            {isdone:true}
+        );
+        set(function(item){
+            let updateData = item.data.map(function(obj){
+                                if(obj._id == id){
+                                    obj.isdone = true;
+                                }
+                                return obj;
+                            });
 
-        try {
-            const res = await axios.put(`${process.env.REACT_APP_APIURL}?id=${id}`, { isdone: true });
-            if (!res.data.success) throw new Error(res.data.msg)
-            set(function (item) {
-                let upDate = item.data.map(function (obj) {
-                    if (obj._id == id) {
-                        obj.isdone = true;
-                    }
-                    return obj;
-
-                });
-
-                return { data: upDate }
-            })
-
-        }
-        catch (err) {
-            console.log(`에러발생 : ${err}`);
-        }
+            return {data:updateData}
+        });
     }
 }))
 
